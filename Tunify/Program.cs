@@ -13,7 +13,7 @@ namespace Tunify
 
             var builder = WebApplication.CreateBuilder(args);
            
-            //new
+            
             builder.Services.AddControllers();
             
             var ConnectionString = builder.Configuration.GetConnectionString("constr");
@@ -21,7 +21,7 @@ namespace Tunify
             builder.Services.AddDbContext<TunifyDbContext>(options =>
             options.UseSqlServer(ConnectionString));
 
-            //new
+           
             //builder.Services.AddScoped<IPlayList, PlayListService>();
             builder.Services.AddTransient<IPlayList, PlayListService>();
             builder.Services.AddTransient<IUsers, UserService>();
@@ -30,7 +30,7 @@ namespace Tunify
 
             var app = builder.Build();
             
-            //new
+            
             app.MapControllers();
             
             app.MapGet("/", () => "Hello World!");
