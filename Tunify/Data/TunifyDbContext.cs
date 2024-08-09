@@ -16,7 +16,7 @@ namespace Tunify.Data
         //public DbSet<Songs> Songs { get; set; }
         //public DbSet<PlayListSongs> PlayListSongs { get; set; }
         //public DbSet<Subscribtions> Subscribions { get; set; }
-        public DbSet<User> Users { get; set; }
+       
            
 
         public TunifyDbContext(DbContextOptions options)
@@ -46,5 +46,9 @@ namespace Tunify.Data
             //modelBuilder.ApplyConfigurationsFromAssembly(typeof(TunifyDbContext).Assembly);
 
         }
+        public DbSet<Tunify.Model.PlayList> PlayList { get; set; } = default!;
+        public DbSet<Tunify.Model.User> Users { get; set; } = default!;
+        public DbSet<Songs> Songs { get; set; }
+        public DbSet<Artists> Artists { get; set; }
     }
 }
