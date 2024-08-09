@@ -29,8 +29,12 @@ namespace Tunify
             builder.Services.AddTransient<IArtist, ArtistService>();
 
             var app = builder.Build();
-            
-            
+
+
+
+
+
+
             app.MapControllers();
             
             app.MapGet("/", () => "Hello World!");
