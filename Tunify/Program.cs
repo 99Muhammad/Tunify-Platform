@@ -7,7 +7,8 @@ namespace Tunify
 {
     public class Program
     {
-       
+
+     
         public static void Main(string[] args)
         {
 
@@ -23,10 +24,11 @@ namespace Tunify
 
             //new
             //builder.Services.AddScoped<IPlayList, PlayListService>();
-            builder.Services.AddTransient<IPlayList, PlayListService>();
-            builder.Services.AddTransient<IUsers, UserService>();
-            builder.Services.AddTransient<ISong, SongService>();
-            builder.Services.AddTransient<IArtist, ArtistService>();
+
+            builder.Services.AddScoped<IPlayList, PlayListService>();
+            builder.Services.AddScoped<IUsers, UserService>();
+            builder.Services.AddScoped<ISong, SongService>();
+            builder.Services.AddScoped<IArtist, ArtistService>();
 
             var app = builder.Build();
             
