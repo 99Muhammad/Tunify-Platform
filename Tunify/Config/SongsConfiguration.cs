@@ -22,6 +22,11 @@ namespace Tunify.Config
             builder.Property(s => s.Genre).HasMaxLength(20);
             builder.Property(x => x.Genre).HasColumnName("Genre");
 
+            builder.HasOne(x => x.artists).WithMany(x => x.songs).
+                HasForeignKey(x => x.ArtistID).IsRequired(false);
+
+
+
             builder.HasData(_LoaudSongInfo());
         }
 
@@ -29,10 +34,11 @@ namespace Tunify.Config
         {
             return new List<Songs>()
             {
-                new Songs {SongID=1,  Title = "JohnDoe", Genre = "johndoe@example.com" },
-                new Songs { SongID=2, Title = "Mark",    Genre =    "Mark@example.com" }
+                new Songs {SongID=1,  Title = "JohnDoe", Genre = "johndoe@example.com",ArtistID=1 },
+                new Songs { SongID=2, Title = "Mark",    Genre =    "Mark@example.com" ,ArtistID=2}
             };
 
+            //}
         }
     }
 }

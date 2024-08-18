@@ -69,6 +69,26 @@ namespace Tunify.Migrations
                     b.HasKey("ArtistsID");
 
                     b.ToTable("Artists");
+
+                    b.HasData(
+                        new
+                        {
+                            ArtistsID = 1,
+                            ArtistName = "Michael Jackson",
+                            Bio = " good"
+                        },
+                        new
+                        {
+                            ArtistsID = 2,
+                            ArtistName = "Pink Floyd",
+                            Bio = " good"
+                        },
+                        new
+                        {
+                            ArtistsID = 3,
+                            ArtistName = "The Beatles",
+                            Bio = " good"
+                        });
                 });
 
             modelBuilder.Entity("Tunify.Model.PlayList", b =>
@@ -109,15 +129,34 @@ namespace Tunify.Migrations
 
             modelBuilder.Entity("Tunify.Model.PlayListSong", b =>
                 {
-                    b.Property<int>("PlayListSongID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("PlayListID")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlayListSongID"));
+                    b.Property<int>("SongID")
+                        .HasColumnType("int");
 
-                    b.HasKey("PlayListSongID");
+                    b.Property<int>("PlayListSongID")
+                        .HasColumnType("int");
 
-                    b.ToTable("PlayListSong");
+                    b.HasKey("PlayListID", "SongID");
+
+                    b.HasIndex("SongID");
+
+                    b.ToTable("PlayListSongs");
+
+                    b.HasData(
+                        new
+                        {
+                            PlayListID = 1,
+                            SongID = 1,
+                            PlayListSongID = 1
+                        },
+                        new
+                        {
+                            PlayListID = 2,
+                            SongID = 1,
+                            PlayListSongID = 2
+                        });
                 });
 
             modelBuilder.Entity("Tunify.Model.Songs", b =>
@@ -127,6 +166,9 @@ namespace Tunify.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SongID"));
+
+                    b.Property<int>("ArtistID")
+                        .HasColumnType("int");
 
                     b.Property<TimeSpan>("Durtion")
                         .HasColumnType("time");
@@ -145,12 +187,15 @@ namespace Tunify.Migrations
 
                     b.HasKey("SongID");
 
+                    b.HasIndex("ArtistID");
+
                     b.ToTable("Songs");
 
                     b.HasData(
                         new
                         {
                             SongID = 1,
+                            ArtistID = 1,
                             Durtion = new TimeSpan(0, 0, 0, 0, 0),
                             Genre = "johndoe@example.com",
                             Title = "JohnDoe"
@@ -158,6 +203,7 @@ namespace Tunify.Migrations
                         new
                         {
                             SongID = 2,
+                            ArtistID = 2,
                             Durtion = new TimeSpan(0, 0, 0, 0, 0),
                             Genre = "Mark@example.com",
                             Title = "Mark"
@@ -229,6 +275,49 @@ namespace Tunify.Migrations
                             Join_Date = new DateTime(2013, 11, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "Mark"
                         });
+                });
+
+            modelBuilder.Entity("Tunify.Model.PlayListSong", b =>
+                {
+                    b.HasOne("Tunify.Model.PlayList", "PlayList")
+                        .WithMany("playListSong")
+                        .HasForeignKey("PlayListID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Tunify.Model.Songs", "Songs")
+                        .WithMany("playListSong")
+                        .HasForeignKey("SongID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PlayList");
+
+                    b.Navigation("Songs");
+                });
+
+            modelBuilder.Entity("Tunify.Model.Songs", b =>
+                {
+                    b.HasOne("Tunify.Model.Artists", "artists")
+                        .WithMany("songs")
+                        .HasForeignKey("ArtistID");
+
+                    b.Navigation("artists");
+                });
+
+            modelBuilder.Entity("Tunify.Model.Artists", b =>
+                {
+                    b.Navigation("songs");
+                });
+
+            modelBuilder.Entity("Tunify.Model.PlayList", b =>
+                {
+                    b.Navigation("playListSong");
+                });
+
+            modelBuilder.Entity("Tunify.Model.Songs", b =>
+                {
+                    b.Navigation("playListSong");
                 });
 #pragma warning restore 612, 618
         }

@@ -7,5 +7,9 @@
         public DateTime CreatedDate { get; set; }
 
 
+        public ICollection<PlayListSong> playListSong { get; set; }=new List<PlayListSong>();
+       
+
+
     }
 }

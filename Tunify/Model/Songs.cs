@@ -8,5 +8,9 @@
         public string Genre { get; set; }
 
 
+        public int ArtistID { get; set; }
+        public Artists artists { get; set; }
+        public ICollection<PlayListSong> playListSong { get; set; } = new List<PlayListSong>();
+
     }
 }

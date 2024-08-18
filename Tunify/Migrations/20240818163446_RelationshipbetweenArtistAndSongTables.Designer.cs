@@ -12,8 +12,8 @@ using Tunify.Data;
 namespace Tunify.Migrations
 {
     [DbContext(typeof(TunifyDbContext))]
-    [Migration("20240806111644_CreateMusicTables")]
-    partial class CreateMusicTables
+    [Migration("20240818163446_RelationshipbetweenArtistAndSongTables")]
+    partial class RelationshipbetweenArtistAndSongTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,19 +94,52 @@ namespace Tunify.Migrations
                     b.HasKey("PlayListID");
 
                     b.ToTable("PlayList");
+
+                    b.HasData(
+                        new
+                        {
+                            PlayListID = 1,
+                            CreatedDate = new DateTime(2021, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PlayListName = "HowYourLife"
+                        },
+                        new
+                        {
+                            PlayListID = 2,
+                            CreatedDate = new DateTime(2019, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PlayListName = "FunG"
+                        });
                 });
 
             modelBuilder.Entity("Tunify.Model.PlayListSong", b =>
                 {
-                    b.Property<int>("PlayListSongID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("PlayListID")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlayListSongID"));
+                    b.Property<int>("SongID")
+                        .HasColumnType("int");
 
-                    b.HasKey("PlayListSongID");
+                    b.Property<int>("PlayListSongID")
+                        .HasColumnType("int");
+
+                    b.HasKey("PlayListID", "SongID");
+
+                    b.HasIndex("SongID");
 
                     b.ToTable("PlayListSong");
+
+                    b.HasData(
+                        new
+                        {
+                            PlayListID = 1,
+                            SongID = 1,
+                            PlayListSongID = 1
+                        },
+                        new
+                        {
+                            PlayListID = 2,
+                            SongID = 1,
+                            PlayListSongID = 2
+                        });
                 });
 
             modelBuilder.Entity("Tunify.Model.Songs", b =>
@@ -135,6 +168,22 @@ namespace Tunify.Migrations
                     b.HasKey("SongID");
 
                     b.ToTable("Songs");
+
+                    b.HasData(
+                        new
+                        {
+                            SongID = 1,
+                            Durtion = new TimeSpan(0, 0, 0, 0, 0),
+                            Genre = "johndoe@example.com",
+                            Title = "JohnDoe"
+                        },
+                        new
+                        {
+                            SongID = 2,
+                            Durtion = new TimeSpan(0, 0, 0, 0, 0),
+                            Genre = "Mark@example.com",
+                            Title = "Mark"
+                        });
                 });
 
             modelBuilder.Entity("Tunify.Model.Subscription", b =>
@@ -170,18 +219,67 @@ namespace Tunify.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("Email")
+                        .HasAnnotation("RegularExpression", "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
 
                     b.Property<DateTime>("Join_Date")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("UserName");
 
                     b.HasKey("UserID");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            UserID = 1,
+                            Email = "johndoe@example.com",
+                            Join_Date = new DateTime(2010, 11, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserName = "JohnDoe"
+                        },
+                        new
+                        {
+                            UserID = 2,
+                            Email = "Mark@example.com",
+                            Join_Date = new DateTime(2013, 11, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserName = "Mark"
+                        });
+                });
+
+            modelBuilder.Entity("Tunify.Model.PlayListSong", b =>
+                {
+                    b.HasOne("Tunify.Model.PlayList", "PlayList")
+                        .WithMany("playListSong")
+                        .HasForeignKey("PlayListID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Tunify.Model.Songs", "Songs")
+                        .WithMany("playListSong")
+                        .HasForeignKey("SongID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PlayList");
+
+                    b.Navigation("Songs");
+                });
+
+            modelBuilder.Entity("Tunify.Model.PlayList", b =>
+                {
+                    b.Navigation("playListSong");
+                });
+
+            modelBuilder.Entity("Tunify.Model.Songs", b =>
+                {
+                    b.Navigation("playListSong");
                 });
 #pragma warning restore 612, 618
         }

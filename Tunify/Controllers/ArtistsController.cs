@@ -65,6 +65,25 @@ namespace Tunify.Controllers
             return Ok(deletedArtist);
         }
 
-      
+
+        //api/Songs/GetAllsongsbyanartist/2
+        [HttpGet]
+        [Route("[action]/{ArtistId}")]
+        public async Task<ActionResult<List<Songs>>> GetAllsongsbyanartist(int ArtistId)
+        {
+            var AssSongs = await _context.GetAllsongsbyanartists(ArtistId);
+            if (AssSongs == null) return NotFound();
+            return Ok(AssSongs);
+        }
+
+
+        //api/Songs/artists/1/songs/2
+    [HttpPost("artists/{artistId}/songs/{songId}")]
+        public async Task<ActionResult<Songs>> AddSongToArtist(int artistId, int songId)
+        {
+            var AddSongToArtist = await _context.AddSongToArtist(artistId, songId);
+            return Ok(AddSongToArtist);
+
+        }
     }
 }

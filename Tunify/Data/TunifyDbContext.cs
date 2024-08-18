@@ -50,5 +50,7 @@ namespace Tunify.Data
         public DbSet<Tunify.Model.User> Users { get; set; } = default!;
         public DbSet<Songs> Songs { get; set; }
         public DbSet<Artists> Artists { get; set; }
+
+        public DbSet<PlayListSong>PlayListSongs { get; set; }
     }
 }

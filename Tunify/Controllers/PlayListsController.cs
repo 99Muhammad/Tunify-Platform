@@ -62,7 +62,25 @@ namespace Tunify.Controllers
             return Ok(deletedPlayList);
         }
 
-       
+        [HttpGet]
+        // api/Songs/GetSongsByPlaylist/2
+        [Route("{action}/{id}")]
+        public async Task<List<Songs>> GetSongsByPlaylist(int id)
+        {
+            var SongInPlayList = await _context.GetSongsByPlaylist(id);
+            return SongInPlayList;
+        }
+
+        [HttpPost("playlists/{playlistId}/songs/{songId}")]
+
+        public async Task<ActionResult<PlayListSong>> AddSongToPlaylist(int songId, int playlistId)
+        {
+
+            var PlayliStsong = await _context.AddPlayListSong(songId, playlistId);
+            return Ok(PlayliStsong);
+
+        }
+
     }
 
     /*
@@ -109,4 +127,7 @@ namespace Tunify.Controllers
         }
 
      */
+
+
+   
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Tunify.Model;
+using Tunify.Repositories.Interfaces;
 
 namespace Tunify.Config
 {
@@ -22,7 +23,20 @@ namespace Tunify.Config
             builder.Property(x => x.Bio).HasColumnType("varchar(256)");
             builder.Property(x => x.Bio).IsRequired(false);
             builder.Property(x => x.Bio).HasColumnName("Bio");
+
+            builder.HasData(LoadArtists());
            
+        }
+
+        private List<Artists> LoadArtists()
+        {
+            return new List<Artists> {
+
+             new Artists { ArtistsID = 1, ArtistName = "Michael Jackson" , Bio =" good" },
+             new Artists{ ArtistsID = 2, ArtistName = "Pink Floyd" , Bio =" good" },
+             new Artists { ArtistsID = 3, ArtistName = "The Beatles" , Bio =" good" },
+
+      };
         }
     }
 }

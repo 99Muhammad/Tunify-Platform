@@ -3,39 +3,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Tunify.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateMusicTables : Migration
+    public partial class RelationshipbetweenArtistAndSongTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "UserName",
-                table: "Users",
-                type: "nvarchar(max)",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(50)",
-                oldMaxLength: 50);
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "Join_Date",
-                table: "Users",
-                type: "datetime2",
-                nullable: false,
-                oldClrType: typeof(DateTime),
-                oldType: "datetime");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Email",
-                table: "Users",
-                type: "nvarchar(max)",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "varchar(256)");
-
             migrationBuilder.CreateTable(
                 name: "Albums",
                 columns: table => new
@@ -80,18 +57,6 @@ namespace Tunify.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PlayListSong",
-                columns: table => new
-                {
-                    PlayListSongID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PlayListSong", x => x.PlayListSongID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Songs",
                 columns: table => new
                 {
@@ -119,6 +84,87 @@ namespace Tunify.Migrations
                 {
                     table.PrimaryKey("PK_Subscription", x => x.SubscriptionID);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    UserID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Email = table.Column<string>(type: "varchar(256)", nullable: false),
+                    Join_Date = table.Column<DateTime>(type: "datetime", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.UserID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PlayListSong",
+                columns: table => new
+                {
+                    PlayListID = table.Column<int>(type: "int", nullable: false),
+                    SongID = table.Column<int>(type: "int", nullable: false),
+                    PlayListSongID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlayListSong", x => new { x.PlayListID, x.SongID });
+                    table.ForeignKey(
+                        name: "FK_PlayListSong_PlayList_PlayListID",
+                        column: x => x.PlayListID,
+                        principalTable: "PlayList",
+                        principalColumn: "PlayListID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PlayListSong_Songs_SongID",
+                        column: x => x.SongID,
+                        principalTable: "Songs",
+                        principalColumn: "SongID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "PlayList",
+                columns: new[] { "PlayListID", "CreatedDate", "PlayListName" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2021, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "HowYourLife" },
+                    { 2, new DateTime(2019, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "FunG" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Songs",
+                columns: new[] { "SongID", "Durtion", "Genre", "Title" },
+                values: new object[,]
+                {
+                    { 1, new TimeSpan(0, 0, 0, 0, 0), "johndoe@example.com", "JohnDoe" },
+                    { 2, new TimeSpan(0, 0, 0, 0, 0), "Mark@example.com", "Mark" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "UserID", "Email", "Join_Date", "UserName" },
+                values: new object[,]
+                {
+                    { 1, "johndoe@example.com", new DateTime(2010, 11, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), "JohnDoe" },
+                    { 2, "Mark@example.com", new DateTime(2013, 11, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), "Mark" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "PlayListSong",
+                columns: new[] { "PlayListID", "SongID", "PlayListSongID" },
+                values: new object[,]
+                {
+                    { 1, 1, 1 },
+                    { 2, 1, 2 }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlayListSong_SongID",
+                table: "PlayListSong",
+                column: "SongID");
         }
 
         /// <inheritdoc />
@@ -131,41 +177,19 @@ namespace Tunify.Migrations
                 name: "Artists");
 
             migrationBuilder.DropTable(
-                name: "PlayList");
-
-            migrationBuilder.DropTable(
                 name: "PlayListSong");
-
-            migrationBuilder.DropTable(
-                name: "Songs");
 
             migrationBuilder.DropTable(
                 name: "Subscription");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "UserName",
-                table: "Users",
-                type: "nvarchar(50)",
-                maxLength: 50,
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+            migrationBuilder.DropTable(
+                name: "Users");
 
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "Join_Date",
-                table: "Users",
-                type: "datetime",
-                nullable: false,
-                oldClrType: typeof(DateTime),
-                oldType: "datetime2");
+            migrationBuilder.DropTable(
+                name: "PlayList");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Email",
-                table: "Users",
-                type: "varchar(256)",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+            migrationBuilder.DropTable(
+                name: "Songs");
         }
     }
 }
