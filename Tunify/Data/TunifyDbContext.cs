@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tunify.Config;
 
 //using Tunify.m;
@@ -6,7 +8,7 @@ using Tunify.Model;
 
 namespace Tunify.Data
 {
-    public class TunifyDbContext:DbContext
+    public class TunifyDbContext:IdentityDbContext<IdentityUser>
        
     {
 

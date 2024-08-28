@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Tunify.Data;
 using Tunify.Model;
@@ -45,12 +46,20 @@ namespace Tunify
 
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<TunifyDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("constr")));
+
+
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+            .AddEntityFrameworkStores<TunifyDbContext>();
+          
+
             builder.Services.AddControllers();
             builder.Services.AddScoped<IUsers, UserService>();
             builder.Services.AddScoped<ISong, SongService>();
             builder.Services.AddScoped<IArtist, ArtistService>();
             builder.Services.AddScoped<IPlayList, PlayListService>();
+            builder.Services.AddScoped<IAccountUsers, IdentityUserService>();
+
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -60,15 +69,17 @@ namespace Tunify
                     Description = "API for managing playlists, songs, and artists in the Tunify Platform"
                 });
             });
+
             var app = builder.Build();
+            
             app.UseSwagger(
              options =>
              {
                  options.RouteTemplate = "api/{documentName}/swagger.json";
              }
-);
+                );
 
-
+            
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/api/v1/swagger.json", "Tunify API v1");
@@ -76,6 +87,7 @@ namespace Tunify
             });
             app.MapControllers();
 
+            app.UseAuthentication();
             //app.MapGet("/", () => "Hello World!");
 
             app.Run();
