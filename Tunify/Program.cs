@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Tunify.Data;
 using Tunify.Model;
 using Tunify.Repositories.Interfaces;
@@ -59,16 +61,61 @@ namespace Tunify
             builder.Services.AddScoped<IArtist, ArtistService>();
             builder.Services.AddScoped<IPlayList, PlayListService>();
             builder.Services.AddScoped<IAccountUsers, IdentityUserService>();
+            builder.Services.AddScoped<jwtTokenService>();
+
+
+            builder.Services.AddAuthentication(
+            options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }
+            ).AddJwtBearer(
+            options =>
+            {
+                options.TokenValidationParameters = jwtTokenService.ValidateToken(builder.Configuration);
+            });
+
 
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
                 {
+
                     Title = "Tunify API",
                     Version = "v1",
                     Description = "API for managing playlists, songs, and artists in the Tunify Platform"
                 });
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Please enter user token below."
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+
+
             });
+
 
             var app = builder.Build();
             
@@ -88,6 +135,7 @@ namespace Tunify
             app.MapControllers();
 
             app.UseAuthentication();
+            app.UseAuthorization();
             //app.MapGet("/", () => "Hello World!");
 
             app.Run();
