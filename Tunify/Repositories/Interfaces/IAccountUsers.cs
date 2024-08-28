@@ -9,8 +9,9 @@ namespace Tunify.Repositories.Interfaces
       public  Task<UserDTO> Register(RegisterDTO user, ModelStateDictionary modelstate);
         Task<UserDTO> LogIn(string username, string password, bool rememberMe);
         Task SignOut();
-     
 
-      //  public Task<string> GenerateTokenAsync(IConfiguration configuration, IdentityUser user);
+        public Task<string> GenerateTokenAsync(IConfiguration configuration, IdentityUser user);
+
+
     }
 }

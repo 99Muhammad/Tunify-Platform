@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.DataProtection.Internal;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Tunify.Model.DTO;
 using Tunify.Repositories.Interfaces;
 
@@ -8,7 +10,7 @@ namespace Tunify.Repositories.Services
 {
     public class IdentityUserService : IAccountUsers
     {
-
+        private readonly jwtTokenService jwtTokenService;
 
 
         private readonly IConfiguration configuration;
@@ -17,23 +19,44 @@ namespace Tunify.Repositories.Services
 
         
 
-        public IdentityUserService(IConfiguration configuration, UserManager<IdentityUser> _userManager, SignInManager<IdentityUser> signin)
+        public IdentityUserService(IConfiguration configuration, UserManager<IdentityUser> _userManager, SignInManager<IdentityUser> signin, jwtTokenService jwtTokenService)
         {
             this.configuration = configuration;
             userManager = _userManager;
             this.signin = signin;
-           
+            this.jwtTokenService = jwtTokenService;
+
         }
 
 
+        public async Task<string> GenerateTokenAsync(IConfiguration configuration, IdentityUser user)
+        {
+
+            var userPrincipal = await signin.CreateUserPrincipalAsync(user);
+            if (userPrincipal == null)
+            {
+                return null;
+            }
+
+            var identity = (ClaimsIdentity)userPrincipal.Identity;
 
 
-        //public Task<string> GenerateTokenAsync(IConfiguration configuration, IdentityUser user)
-        //{
-        //    throw new NotImplementedException();
-        //}
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+            identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
 
-      
+
+            var roles = await userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                identity.AddClaim(new Claim(ClaimTypes.Role, role));
+            }
+
+
+            return jwtTokenService.GenerateToken(userPrincipal);
+        }
+
+
 
         public async Task<UserDTO> LogIn(string username, string password, bool rememberMe)
         {
@@ -47,7 +70,7 @@ namespace Tunify.Repositories.Services
                 return new UserDTO
                 {
                     UserName = username,
-                    
+                    Token = await GenerateTokenAsync(configuration, user),
                     Roles = roles.ToList(),
 
                 };
@@ -74,10 +97,12 @@ namespace Tunify.Repositories.Services
             };
             var result = await userManager.CreateAsync(user, userRegister.Password);
 
+
+
             if (result.Succeeded)
             {
                 await signin.SignInAsync(user, isPersistent: false);
-              //  var role = await userManager.AddToRolesAsync(user, userRegister.Roles);
+                var role = await userManager.AddToRolesAsync(user, userRegister.Roles);
                 return new UserDTO
                 {
                     Id = user.Id,

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 using Tunify.Model;
@@ -18,6 +19,7 @@ namespace Tunify.Controllers
             UserAccount = user;
         }
 
+        [Authorize]
         [HttpPost("Register")]
         public async Task<IActionResult> RegisterC(RegisterDTO registerUser)
         {
@@ -36,7 +38,7 @@ namespace Tunify.Controllers
             return BadRequest();
         }
 
-
+        [Authorize]
         [HttpPost("LogIn")]
         public async Task<IActionResult> Authentication(string username, string password, bool rememberMe)
         {
@@ -51,6 +53,7 @@ namespace Tunify.Controllers
             return BadRequest();
         }
 
+        [Authorize]
         [HttpPost("LogOut")]
         public async Task<IActionResult> SignOut()
         {
